@@ -64,7 +64,7 @@ int main()
 
 	{
 		ctpl::thread_pool thread_pool(static_cast<int>(std::thread::hardware_concurrency()));
-		std::cout << "ctpl thread_pool launch calls per second: "
+		std::cout << "ctpl launch calls per second: "
 			<< calls_per_second([&thread_pool]() { auto result = thread_pool.push(do_nothing1);
 		result.wait(); }, 5)
 			<< std::endl;
