@@ -5,7 +5,11 @@
 *
 */
 
+#pragma once
+
 #include "thread_pool.h"
+#include "ctpl.h"
+#include "ThreadPool.h"
 
 #include <chrono>
 #include <thread>
@@ -13,8 +17,8 @@
 #include <iostream>
 #include <stdexcept>
 
+extern void do_nothing1(int id);
 extern void do_nothing();
-
 
 template <typename T>
 long long unsigned int calls_per_second(const T &thecall, unsigned int interval)
@@ -37,7 +41,6 @@ long long unsigned int calls_per_second(const T &thecall, unsigned int interval)
 
 int main()
 {
-	ThreadPool thread_pool(0);
 
 	std::cout << "Do nothing calls per second: " << calls_per_second([]() {}, 5) << std::endl;
 	std::cout << "Empty calls per second: " << calls_per_second([]() { do_nothing(); }, 5) << std::endl;
@@ -51,10 +54,28 @@ int main()
 							    future.wait(); }, 5 ) 
 		<< std::endl;
 
-	std::cout << "thread_pool launch calls per second: " 
-		<< calls_per_second([&thread_pool]() { auto result = thread_pool.enqueue(&do_nothing);
-											   result.wait(); }, 5) 
-		<< std::endl;
+	{
+		ThreadPool thread_pool;
+		std::cout << "thread_pool launch calls per second: "
+			<< calls_per_second([&thread_pool]() { auto result = thread_pool.enqueue(&do_nothing);
+		result.wait(); }, 5)
+			<< std::endl;
+	}
+
+	{
+		ctpl::thread_pool thread_pool(static_cast<int>(std::thread::hardware_concurrency()));
+		std::cout << "ctpl thread_pool launch calls per second: "
+			<< calls_per_second([&thread_pool]() { auto result = thread_pool.push(do_nothing1);
+		result.wait(); }, 5)
+			<< std::endl;
+	}
+
+	{
+		std::cout << "DefaultThreadPool launch calls per second: "
+			<< calls_per_second([]() { auto result = MyNamespace::DefaultThreadPool::submitJob(do_nothing);
+		result.get(); }, 5)
+			<< std::endl;
+	}
 
 	std::this_thread::sleep_for(std::chrono::seconds(10));
 	return 0;

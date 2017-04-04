@@ -146,6 +146,9 @@
     <ClCompile Include="thread_test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ctpl.h" />
+    <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="ThreadSafeQueue.h" />
     <ClInclude Include="thread_pool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

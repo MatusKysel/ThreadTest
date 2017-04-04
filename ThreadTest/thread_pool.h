@@ -5,6 +5,8 @@
 *
 */
 
+#pragma once
+
 #ifndef _THREAD_POOL_H_
 #define _THREAD_POOL_H_
 
@@ -35,13 +37,9 @@ private:
 	bool stop;
 };
 
-inline ThreadPool::ThreadPool(size_t threads)
+inline ThreadPool::ThreadPool(size_t threads = static_cast<size_t>(std::thread::hardware_concurrency()))
 	: stop(false)
 {
-
-	if (threads == 0)
-		threads = std::max(4, static_cast<int>(std::thread::hardware_concurrency()));
-
 	for (size_t i = 0; i < threads; ++i)
 		workers.emplace_back(
 			[this]
